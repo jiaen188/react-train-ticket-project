@@ -5,20 +5,14 @@ import './App.css';
 const BatteryContext = createContext()
 const OnlineContext = createContext()
 
-function Leaf() {
-  return (
-    <BatteryContext.Consumer>
-      {
-        battery => (
-          <OnlineContext.Consumer>
-            {
-              online => <h1>Battery: {battery}, Online: {String(online)}</h1>
-            }
-          </OnlineContext.Consumer>
-        )
-      }
-    </BatteryContext.Consumer>
-  )
+class Leaf extends Component {
+  static contextType = BatteryContext
+  render() {
+    const battery = this.context
+    return (
+      <h1>Battery: {battery}</h1>
+    )
+  }
 }
 
 function Middle() {
