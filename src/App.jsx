@@ -1,47 +1,37 @@
-import React, { createContext, Component } from 'react';
+import React, { Component, lazy, Suspense } from 'react';
 // import logo from './logo.svg';
 import './App.css';
 
-const BatteryContext = createContext()
-const OnlineContext = createContext()
+const About = lazy(() => import(/*webpackChunkName: "about"*/'./About.jsx'))
 
-class Leaf extends Component {
-  static contextType = BatteryContext
-  render() {
-    const battery = this.context
-    return (
-      <h1>Battery: {battery}</h1>
-    )
-  }
-}
-
-function Middle() {
-  return (
-    <Leaf></Leaf>
-  )
-}
+// ErrorBoundary
+// componentDidCatch
 
 class App extends Component {
   state = {
-    battery: 60,
-    online: true
+    hasError: false
   }
-  render() {
-    const { battery, online } = this.state
+  componentDidCatch(err, info) {
+    console.log(err, info)
+  }
+  static getDerivedStateFromError() {
+    return {
+      hasError: true
+    }
+  }
+  render () {
+    console.log('this.state.hasError', this.state.hasError)
+    if (this.state.hasError) {
+      return (
+        <div>error</div>
+      )
+    }
     return (
-      <BatteryContext.Provider value={battery}>
-        <OnlineContext.Provider value={online}>
-          <button
-            type="button"
-            onClick={ () => this.setState({ battery: battery - 1 }) }
-          >press</button>
-          <button
-            type="button"
-            onClick={ () => this.setState({ online: !online }) }
-          >switch</button>
-          <Middle></Middle>
-        </OnlineContext.Provider>
-      </BatteryContext.Provider>
+      <div>
+        <Suspense fallback={<div>loading</div>}>
+          <About></About>
+        </Suspense>
+      </div>
     )
   }
 }
