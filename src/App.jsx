@@ -1,53 +1,52 @@
-import React, { Component, useState, createContext, useContext } from 'react';
+import React, { Component, useState, useMemo, memo, useCallback } from 'react';
 import './App.css';
 
-const CountContext = createContext()
-
-class Foo extends Component {
-  render () {
-    return (
-      <CountContext.Consumer>
-        {
-          count => <h1>{count}</h1>
-        }
-      </CountContext.Consumer>
-    )
-  }
-}
-
-class Bar extends Component {
-  static contextType = CountContext
-  render () {
-    const count = this.context
-    return (
-      <h1>{count}</h1>
-    )
-  }
-}
-
-function Counter () {
-  const count = useContext(CountContext)
+const Counter = memo(function (props) {
+  console.log('Counter render')
   return (
-    <h1>{count}</h1>
+    <h1 onClick={props.onClick}>{props.count}</h1>
   )
-}
+})
 
 function App(props) {
   console.log('app render')
   const [count, setCount] = useState(0)
+  const [clickCount, setClickCount] = useState(0)
+
+  const double = useMemo(() => {
+    return count * 2
+  }, [count === 3])
+
+  // useMemo(() => fn) 和 useCallback 等价
+  // const onClick = useMemo(() => {
+  //   return () => {
+  //     console.log('onclick')
+  //   }
+  // }, [])
+
+  // const onClick = useCallback(() => {
+  //   console.log('onclick')
+  // }, [])
+
+  // const onClick = useCallback(() => {
+  //   console.log('onclick')
+  //   setClickCount(clickCount + 1)
+  // }, [clickCount])
+
+  // 这两个等价
+  const onClick = useCallback(() => {
+    console.log('onclick')
+    setClickCount(clickCount => clickCount + 1)
+  }, [])
 
   return (
     <div>
-    <button
-      onClick={() => { setCount(count + 1) }}  
-    >
-      click ({count})
-    </button>
-    <CountContext.Provider value={count}>
-      <Foo></Foo>
-      <Bar></Bar>
-      <Counter></Counter>
-    </CountContext.Provider>
+      <button
+        onClick={() => { setCount(count + 1) }}  
+      >
+        click ({count}), double is {double}
+      </button>
+      <Counter count={double} onClick={onClick}></Counter>
     </div>
   )
 }
