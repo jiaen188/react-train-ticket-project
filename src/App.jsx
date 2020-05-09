@@ -5,6 +5,7 @@ import {
   createRemove,
   createToggle
 } from './actions'
+import reducer from './reducers'
 import './App.css';
 
 let idSeq = Date.now()
@@ -91,6 +92,7 @@ const LS_KEY = '_$_todos'
 
 function TodoList() {
   const [todos, setTodos] = useState([])
+  const [incrementCount, setIncrementCount] = useState(0)
 
   // const addTodo = useCallback((todo) => {
   //   setTodos(todos => [...todos, todo])
@@ -114,39 +116,33 @@ function TodoList() {
   // }, [])
 
   const dispatch = useCallback((action) => {
-    const { type, payload } = action
-    switch(type) {
-      case 'set':
-        setTodos(payload)
-        break;
-      case 'add':
-        setTodos(todos => [...todos, payload])
-        break;
-      case 'remove':
-        setTodos(todos => todos.filter(todo => {
-          return todo.id !== payload
-        }))
-        break;
-      case 'toggle':
-        setTodos(todos => todos.map(todo => {
-          return todo.id === payload
-            ? {
-              ...todo,
-              complete: !todo.complete
-            }
-            : todo
-        }))
-        break;
-      default:
+    console.log('aciton', action)
+    const state = {
+      todos,
+      incrementCount
     }
+
+    const setter = {
+      todos: setTodos,
+      incrementCount: setIncrementCount
+    }
+
+    const newState = reducer(state, action)
+    console.log('newState', newState)
+
+    for (const key in newState) {
+      setter[key](newState[key])
+    }
+  }, [todos, incrementCount])
+
+  useEffect(() => {
+    console.log('useEffect get')
+    const todos = JSON.parse(localStorage.getItem(LS_KEY) || '[]')
+    dispatch(createSet(todos))
   }, [])
 
   useEffect(() => {
-    const todos = JSON.parse(localStorage.getItem(LS_KEY) || '[]')
-    dispatch(createSet(todos))
-  }, [dispatch])
-
-  useEffect(() => {
+    console.log('useEffect set')
     localStorage.setItem(LS_KEY, JSON.stringify(todos))
   }, [todos])
 
