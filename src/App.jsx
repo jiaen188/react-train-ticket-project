@@ -8,8 +8,6 @@ import {
 import reducer from './reducers'
 import './App.css';
 
-let idSeq = Date.now()
-
 function bindActionCreators(actionCreators, dispatch) {
   const ret = {}
   for (const key in actionCreators) {
@@ -39,11 +37,7 @@ const Control = memo(function Control(props) {
       return
     }
 
-    addTodo({
-      id: ++idSeq,
-      text: newText,
-      complete: false
-    })
+    addTodo(newText)
 
     inputRef.current.value = ''
   }
@@ -90,50 +84,42 @@ const Todos = memo(function Todos(props) {
 
 const LS_KEY = '_$_todos'
 
+let store = {
+  todos: [],
+  incrementCount: 0
+}
+
 function TodoList() {
   const [todos, setTodos] = useState([])
   const [incrementCount, setIncrementCount] = useState(0)
 
-  // const addTodo = useCallback((todo) => {
-  //   setTodos(todos => [...todos, todo])
-  // }, [])
-
-  // const removeTodo = useCallback((id) => {
-  //   setTodos(todos => todos.filter(todo => {
-  //     return todo.id !== id
-  //   }))
-  // }, [])
-
-  // const toggleTodo = useCallback((id) => {
-  //   setTodos(todos => todos.map(todo => {
-  //     return todo.id === id
-  //       ? {
-  //         ...todo,
-  //         complete: !todo.complete
-  //       }
-  //       : todo
-  //   }))
-  // }, [])
-
-  const dispatch = useCallback((action) => {
-    console.log('aciton', action)
-    const state = {
+  useEffect(() => {
+    Object.assign(store, {
       todos,
       incrementCount
-    }
+    })
+  }, [todos, incrementCount])
+
+  const dispatch = (action) => {
+    console.log('aciton', action)
 
     const setter = {
       todos: setTodos,
       incrementCount: setIncrementCount
     }
 
-    const newState = reducer(state, action)
+    if (typeof action === 'function') {
+      action(dispatch, () => store)
+      return
+    }
+
+    const newState = reducer(store, action)
     console.log('newState', newState)
 
     for (const key in newState) {
       setter[key](newState[key])
     }
-  }, [todos, incrementCount])
+  }
 
   useEffect(() => {
     console.log('useEffect get')
