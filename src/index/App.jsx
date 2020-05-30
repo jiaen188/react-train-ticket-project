@@ -12,15 +12,21 @@ import HighSpeed from './HighSpeed'
 import Journey from './Journey'
 import Submit from './Submit'
 
+import CitySelector from '../common/CitySelector'
+
 import {
   exchangeFromTo,
-  showCitySelector
+  showCitySelector,
+  hideCitySelector
 } from './actions'
 
 function App(props) {
   const {
     from,
     to,
+    isCitySelectorVisible,
+    cityData,
+    isLoadingCityData,
     dispatch
   } = props
 
@@ -43,6 +49,12 @@ function App(props) {
     }, dispatch)
   }, [])
 
+  const citySelectorCbs = useMemo(() => {
+    return bindActionCreators({
+      onBack: hideCitySelector
+    }, dispatch)
+  })
+
   return (
     <div>
       <div className="header-wrapper">
@@ -64,6 +76,11 @@ function App(props) {
         <HighSpeed></HighSpeed>
         <Submit></Submit>
       </form>
+      <CitySelector
+        show={isCitySelectorVisible}
+        cityData={cityData}
+        isLoading={isLoadingCityData}
+        { ...citySelectorCbs }></CitySelector>
     </div>
   )
 }

@@ -49,12 +49,12 @@ export function showCitySelector (currentSelectingLeftCity) {
   return (dispatch) => {
     dispatch({
       type: ACTION_SET_IS_CITY_SELECTOR_VISIBLE,
-      playload: true
+      payload: true
     })
 
     dispatch({
       type: ACTION_SET_CURRENT_SELECTING_LEFT_CITY,
-      playload: currentSelectingLeftCity
+      payload: currentSelectingLeftCity
     })
   }
 }
