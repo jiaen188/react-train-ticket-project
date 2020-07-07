@@ -23,7 +23,8 @@ import {
   setSelectedCity,
   showDateSelector,
   hideDateSelector,
-  setDepartDate
+  setDepartDate,
+  toggleHighSpeed
 } from './actions'
 import { h0 } from '../common/fp'
 
@@ -36,7 +37,8 @@ function App(props) {
     cityData,
     isLoadingCityData,
     dispatch,
-    departDate
+    departDate,
+    highSpeed
   } = props
 
   const onBack = useCallback(() => {
@@ -78,6 +80,12 @@ function App(props) {
     }, dispatch)
   }, [])
 
+  const highSpeedCbs = useMemo(() => {
+    return bindActionCreators({
+      toggle: toggleHighSpeed
+    }, dispatch)
+  }, [])
+
   const onSelectDate = useCallback((day) => {
     if (!day) {
       return
@@ -109,7 +117,9 @@ function App(props) {
         <DepartDate
           time={departDate}
           {...departDateCbs}></DepartDate>
-        <HighSpeed></HighSpeed>
+        <HighSpeed
+          highSpeed={highSpeed}
+          {...highSpeedCbs}></HighSpeed>
         <Submit></Submit>
       </form>
       <CitySelector
