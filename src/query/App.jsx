@@ -1,5 +1,6 @@
 import { connect } from 'react-redux'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
+import { bindActionCreators } from 'redux';
 import URI from 'urijs'
 import Header from '../common/Header'
 import Nav from '../common/Nav'
@@ -20,7 +21,11 @@ import {
   setDepartStations,
   setArriveStations,
   prevDate,
-  nextDate
+  nextDate,
+  toggleOrderType,
+  toggleHighSpeed,
+  toggleOnlyTickets,
+  toggleIsFiltersVisible,
 } from './actions'
 import './App.css'
 import dayjs from 'dayjs'
@@ -38,6 +43,7 @@ function App(props) {
     dispatch,
     orderType,
     onlyTickets,
+    isFiltersVisible,
     checkedTicketTypes,
     checkedTrainTypes,
     checkedDepartStations,
@@ -145,6 +151,18 @@ function App(props) {
     dispatch,
     prevDate,
     nextDate);
+  
+    const bottomCbs = useMemo(() => {
+      return bindActionCreators(
+        {
+          toggleOrderType,
+          toggleHighSpeed,
+          toggleOnlyTickets,
+          toggleIsFiltersVisible,
+        },
+        dispatch
+      );
+    }, []);
 
   if (!searchParsed) {
     return null
@@ -163,7 +181,12 @@ function App(props) {
         next={next}
       />
       <List list={trainList}></List>
-      <Bottom></Bottom>
+      <Bottom
+        highSpeed={highSpeed}
+        orderType={orderType}
+        onlyTickets={onlyTickets}
+        isFiltersVisible={isFiltersVisible}
+        {...bottomCbs}></Bottom>
     </div>
   )
 }
